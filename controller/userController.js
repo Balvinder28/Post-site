@@ -1,10 +1,11 @@
 const User = require('../models/User')
+const Post = require('../models/Post')
 exports.login=function(req,res)
 {
 let user=new User(req.body)
 user.login().then(function(result){
   //creating new session object unique per browser visit
-  req.session.user={avatar:user.avatar,username: user.data.username}
+  req.session.user={avatar:user.avatar,username: user.data.username,_id: user.data._id}
 //now we need to redirect to home page but we need to check timing with above session, so sessesion auto save but in order to sync we are saving 
   req.session.save(function(){
     res.redirect('/')
@@ -48,6 +49,7 @@ req.flash('regErrors',error)
 exports.mustbeloggedin=function(req,res,next){
   if(req.session.user)
   {
+    console.log(req.session.user)
   next()
 }else{
   req.flash("errors","You must logged in to perform that action!!")
@@ -56,6 +58,40 @@ exports.mustbeloggedin=function(req,res,next){
   })
 }
 }
+
+
+
+        // to check user exists
+exports.ifUserExists = function(req, res, next)
+ {
+
+ User.findByUsername(req.params.username).then(function(userDocument) {
+  req.profileUser = userDocument
+  //console.log(req.profileUser)
+   next()
+  }).catch(function() {
+  res.render("404")
+   })
+   }
+              
+
+exports.profilePostsScreen = function(req, res) {
+  // ask our post model for posts by a certain author id
+  console.log(req.profileUser._id)
+  Post.findByAuthorId(req.profileUser._id).then(function(posts) {
+    res.render('profile', {
+      posts: posts,
+      profileUsername: req.profileUser.username,
+      profileAvatar: req.profileUser.avatar
+    })
+  }).catch(function() {
+    res.render("404")
+  })
+
+}
+
+
+
 
 exports.home= function(req,res){
        
@@ -68,3 +104,5 @@ exports.home= function(req,res){
     res.render('home-guest',{errors: req.flash('errors'),regErrors: req.flash('regErrors')})
   }
         } 
+
+

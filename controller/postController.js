@@ -5,6 +5,7 @@ res.render('create-post')
 }
 
 exports.create = function(req, res) {
+  console.log()
     let post = new Post(req.body, req.session.user._id)
     post.create().then(function() {
       res.send("New post created.")
@@ -15,9 +16,9 @@ exports.create = function(req, res) {
 
   exports.viewSingle =async function(req, res) {
     try {
-      let post =await Post.findSingleById(req.params.id)
+      let post =await Post.findSingleById(req.params.id,req.visitorId)
       res.render('single-post-screen', {post: post})
     } catch {
-      res.send("404 template will go here.")
+      res.render('404')
     }
   }

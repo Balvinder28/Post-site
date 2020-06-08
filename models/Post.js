@@ -1,5 +1,6 @@
 const postsCollection = require('../db').db().collection("posts")
 const ObjectID = require('mongodb').ObjectID
+const User = require('./User')
 
 let Post = function(data, userid) {
   this.data = data
@@ -42,18 +43,69 @@ Post.prototype.create = function() {
     }
   })
 }
-Post.findSingleById = function(id) {
+
+Post.reusablePostQuery = function(uniqueOperations,visitorId) {
+  return new Promise(async function(resolve, reject) {
+    console.log("Visitor Id")
+    console.log(visitorId)
+    let aggOperations = uniqueOperations.concat([
+      {$lookup: {from: "users", localField: "author", foreignField: "_id", as: "authorDocument"}},
+      {$project: {
+        title: 1,
+        body: 1,
+        createdDate: 1,
+        authorId: "$author",//in mongodb if you use $ it understand that you are taking value not string
+        author: {$arrayElemAt: ["$authorDocument", 0]}
+      }}
+    ])
+
+    let posts = await postsCollection.aggregate(aggOperations).toArray()
+
+    // clean up author property in each post object
+    posts = posts.map(function(post) {
+//matches login user and url accessing user if same he can edit or delete post
+console.log(visitorId)
+post.isVisitorOwner=post.authorId.equals(visitorId)
+
+      post.author = {
+        username: post.author.username,
+        avatar: new User(post.author, true).avatar
+      }
+
+      return post
+    })
+
+    resolve(posts)
+  })
+}
+
+Post.findSingleById = function(id,visitorId) {
   return new Promise(async function(resolve, reject) {
     if (typeof(id) != "string" || !ObjectID.isValid(id)) {
       reject()
       return
     }
-    let post = await postsCollection.findOne({_id: new ObjectID(id)})
-    if (post) {
-      resolve(post)
+    
+    let posts = await Post.reusablePostQuery([
+      {$match: {_id: new ObjectID(id)}}
+    ],visitorId)
+
+    if (posts.length) {
+      console.log(posts[0])
+      resolve(posts[0])
     } else {
       reject()
     }
   })
 }
+
+Post.findByAuthorId = function(authorId) {
+  console.log("Author ID:")
+console.log(authorId)
+  return Post.reusablePostQuery([
+    {$match: {author: authorId}},
+    {$sort: {createdDate: -1}}
+  ])
+}
+
 module.exports = Post

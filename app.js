@@ -22,10 +22,20 @@ app.use(flash())
 //to make session object globally available
 //run this for every request and run before router
 app.use(function(req,res,next){
+   
+   //make current user id available on the req object
+   if(req.session.user)
+   {
+       req.visitorId=req.session.user._id
+   }else
+   {
+    req.visitorId=0
+   }
+   
     //obj available on ejs locally
 res.locals.user=req.session.user
 next()
-})
+}) 
 //to define router variable to call router file in current folder
 const router=require('./router')
 //to accept input from browser as request.body

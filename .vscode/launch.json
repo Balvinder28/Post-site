@@ -9,7 +9,15 @@
             "request": "launch",
             "name": "Launch Chrome",
             "url": "http://localhost:4000",
-            "webRoot": "${workspaceFolder}/public"
+           // "webRoot": "${workspaceFolder}"
+           "webRoot": "C:\\Users\\Balvinder Kaur\\Desktop\\Complex-App"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch Chrome",
+            "url": "http://localhost:4000",
+            "webRoot": "${workspaceFolder}"
         },
         {
             "type": "node",
