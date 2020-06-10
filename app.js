@@ -1,7 +1,8 @@
 const express=require('express')
 const app=express()
-
-
+// To include markdown tags in your body post
+const markdown = require('marked')
+const sanitizeHTML = require('sanitize-html')
 const session = require('express-session')
 //refrencing mongo session
 const MongoStore=require('connect-mongo')(session)
@@ -21,21 +22,27 @@ app.use(sessionOptions)
 app.use(flash())
 //to make session object globally available
 //run this for every request and run before router
-app.use(function(req,res,next){
-   
-   //make current user id available on the req object
-   if(req.session.user)
-   {
-       req.visitorId=req.session.user._id
-   }else
-   {
-    req.visitorId=0
-   }
-   
+//obj available on ejs locally     
     //obj available on ejs locally
-res.locals.user=req.session.user
-next()
-}) 
+  //obj available on ejs locally     
+
+  app.use(function(req, res, next) {
+    // make our markdown function available from within ejs templates
+  res.locals.filterUserHTML = function(content) {
+    return sanitizeHTML(markdown(content), {allowedTags: ['p', 'br', 'ul', 'ol', 'li', 'strong', 'bold', 'i', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'], allowedAttributes: {}})
+  }
+    // make all error and success flash messages available from all templates
+  res.locals.errors = req.flash("errors")
+  res.locals.success = req.flash("success")
+    // make current user id available on the req object
+    if (req.session.user) {req.visitorId = req.session.user._id} else {req.visitorId = 0}
+    
+    // make user session data available from within view templates
+    res.locals.user = req.session.user
+    next()
+  })
+
+
 //to define router variable to call router file in current folder
 const router=require('./router')
 //to accept input from browser as request.body

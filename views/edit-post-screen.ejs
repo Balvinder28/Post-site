@@ -1,0 +1,29 @@
+<%- include('includes/header')%>
+  <div class="container py-md-5 container--narrow">
+    
+    <%- include('includes/flash') %>
+    <a class="small font-weight-bold" href="/post/<%= post._id %>">&laquo; Back to post permalink</a>
+
+    <form class="mt-3" action="/post/edit/<%=post._id%>" method="POST">
+      <div class="form-group">
+        <label for="post-title" class="text-muted mb-1"><small>Title</small></label>
+        <input required name="title" value="<%=post.title%>" id="post-title" class="form-control form-control-lg form-control-title" type="text" placeholder="" autocomplete="off">
+      </div>
+
+      <div class="form-group">
+        <label for="post-body" class="text-muted mb-1"><small>Body Content</small></label>
+     
+        <textarea required name="body" id="post-body" class="body-content tall-textarea form-control" type="text"></textarea>
+        Total word Count : <span id="display_count">0</span> words.
+     
+        <textarea name="the-textarea" id="the-textarea" maxlength="300" placeholder="Start Typin..."autofocus><%=post.body%></textarea>
+  <div id="the-count">
+    <span id="current">0</span>
+    <span id="maximum">/ 300</span>
+      </div>
+      
+      <button class="btn btn-primary">Save Updates</button>
+    </form>
+  </div>
+  
+  <%- include('includes/footer')%>

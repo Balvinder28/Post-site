@@ -18,5 +18,7 @@ router.get('/profile/:username',usercontroller.ifUserExists, usercontroller.prof
 router.get('/create-post',usercontroller.mustbeloggedin,postcontroller.createpost)
 router.post('/create-post',usercontroller.mustbeloggedin,postcontroller.create)
 router.get('/post/:id',postcontroller.viewSingle)
-
+router.get('/post/edit/:id',postcontroller.viewEditPost)
+router.post('/post/edit/:id',usercontroller.mustbeloggedin,postcontroller.updateEditedPost)
+router.post('/post/delete/:id',usercontroller.mustbeloggedin,postcontroller.deletePost)
 module.exports=router
