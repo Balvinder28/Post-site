@@ -23,6 +23,6 @@
     "mongodb": "^3.5.8",
     "nodemon": "^2.0.4",
     "sanitize-html": "^1.26.0",
-    "validator": "^13.0.0"
+    "validator": "^13.7.0"
   }
 }
